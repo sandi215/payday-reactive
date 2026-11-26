@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayDay — recurring payments on autopilot</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>☀️ PayDay</h1>
+  <p class="subtitle">Recurring payments on autopilot — no bot, no server, no keeper.</p>
+  <p class="badge">Reactive Omni Buildathon · Track: Set It and Forget It</p>
+</header>
+
+<main>
+  <section class="card" id="contracts">
+    <h2>Contracts <span class="muted">(testnet)</span></h2>
+    <dl>
+      <dt>PayDayReactive</dt>
+      <dd><code id="reactiveAddr">0x47800f60e6b135813Ff3fa68fe3cD3AF50C6264f</code>
+        <a id="reactiveLink" href="https://lasna.reactscan.net/address/0x47800f60e6b135813Ff3fa68fe3cD3AF50C6264f" target="_blank" rel="noopener">Lasna explorer ↗</a>
+        <span class="muted">· Reactive Lasna (chain 5318007)</span></dd>
+      <dt>PayDayPayer</dt>
+      <dd><code id="payerAddr">0x68be47672e809c7803c508451f66ba2907f210d5</code>
+        <a id="payerLink" href="https://sepolia.basescan.org/address/0x68be47672e809c7803c508451f66ba2907f210d5" target="_blank" rel="noopener">Basescan ↗</a>
+        <span class="muted">· Base Sepolia (chain 84532)</span></dd>
+      <dt>Escrow balance</dt>
+      <dd><strong id="escrow">…</strong> <span class="muted">ETH on PayDayPayer</span></dd>
+      <dt>Reactive balance</dt>
+      <dd><strong id="reactiveBal">…</strong> <span class="muted">lREACT on PayDayReactive (pays for reactive txs)</span></dd>
+      <dt>Automation</dt>
+      <dd><strong id="automation">…</strong> <span class="muted">CRON100 tick every ~2 min on Lasna</span></dd>
+    </dl>
+    <p class="muted small">How it works: every CRON100 tick, PayDayReactive scans due plans on Lasna and requests a callback to PayDayPayer on Base Sepolia, which pays the recipient from escrow. <a href="../video/payday-demo.mp4">Watch the demo video 🎬</a></p>
+  </section>
+
+  <section class="card">
+    <h2>Plans <button id="refreshBtn" type="button">↻ Refresh</button></h2>
+    <div id="plansStatus" class="muted">Loading plans…</div>
+    <table id="plansTable">
+      <thead><tr><th>#</th><th>Recipient</th><th>Amount</th><th>Interval</th><th>Next due</th><th>Status</th></tr></thead>
+      <tbody id="plansBody"></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Create a plan</h2>
+    <p class="muted">Needs a wallet (MetaMask) on <strong>Reactive Lasna</strong>. First payment is due after one interval (minimum 60 s).</p>
+    <div id="walletBox">
+      <button id="connectBtn" type="button">Connect wallet</button>
+      <span id="walletAddr" class="muted"></span>
+    </div>
+    <form id="createForm">
+      <label>Recipient address <input id="inRecipient" type="text" placeholder="0x…" required></label>
+      <label>Amount (ETH) <input id="inAmount" type="number" step="0.00001" min="0.00001" placeholder="0.0001" required></label>
+      <label>Interval (seconds, min 60) <input id="inInterval" type="number" min="60" step="1" value="300" required></label>
+      <button type="submit" id="createBtn" disabled>Create plan</button>
+    </form>
+    <p id="createMsg" class="muted"></p>
+  </section>
+
+  <section class="card">
+    <h2>Fund the escrow</h2>
+    <p class="muted">Payments come from the escrow on PayDayPayer (Base Sepolia). Needs a wallet on <strong>Base Sepolia</strong>.</p>
+    <form id="fundForm">
+      <label>Amount (ETH) <input id="inFund" type="number" step="0.00001" min="0.00001" placeholder="0.0002" required></label>
+      <button type="submit" id="fundBtn" disabled>Fund escrow</button>
+    </form>
+    <p id="fundMsg" class="muted"></p>
+  </section>
+
+  <section class="card">
+    <h2>Recent activity</h2>
+    <div id="activityStatus" class="muted">Loading events…</div>
+    <ul id="activityList"></ul>
+  </section>
+
+  <p id="errorBox" class="error" hidden></p>
+  <p class="muted small">Last refresh: <span id="lastRefresh">—</span></p>
+</main>
+
+<footer>
+  <p class="muted small">PayDay · Reactive Omni Buildathon · <a href="https://github.com/sandi215/payday-reactive" target="_blank" rel="noopener">github.com/sandi215/payday-reactive</a> (repo to be published) · MIT</p>
+</footer>
+
+<script src="ethers.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
